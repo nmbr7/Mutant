@@ -1,0 +1,8 @@
+[package]
+name = "Mutant"
+version = "0.1.0"
+authors = ["nmbr7 <suhailr7@ymail.com>"]
+edition = "2018"
+
+[dependencies]
+rand = "0.6.5"
