@@ -44,15 +44,15 @@ pub enum MutType {
 
 pub fn mutate(buf: Vec<u8>, rand: usize) -> Vec<u8> {
     /*unsafe{
+
     println!("{}",String::from_utf8_unchecked(buf.clone()));
 
     }println!(" {} {}",len,buf.len());
        */
 
     let len = buf.len();
-
     let (buf, mutant) = loop {
-        let (mut buf, mutant) = match random(8) {
+        let (mut buf, mutant) = match random(rand) {
             1 => ascii_mod(len, buf.clone()),
             0 => bit_flip(len, buf.clone()),
             2 => nibble_flip(len, buf.clone()),
@@ -75,7 +75,7 @@ pub fn mutate(buf: Vec<u8>, rand: usize) -> Vec<u8> {
     buf
 }
 
-fn bit_flip(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn bit_flip(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let mut buf = buf;
     let pos = if len < buf.len() {
         random_range(len, buf.len())
@@ -92,7 +92,7 @@ fn bit_flip(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::BitFlip)
 }
 
-fn nibble_flip(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn nibble_flip(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let pos = if len < buf.len() {
         random_range(len, buf.len())
     } else {
@@ -111,7 +111,7 @@ fn nibble_flip(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::NibbleFlip)
 }
 
-fn byte_mod(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn byte_mod(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let pos = if len < buf.len() {
         random_range(len, buf.len())
     } else {
@@ -122,7 +122,7 @@ fn byte_mod(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::ByteMod)
 }
 
-fn int_mod(len: usize, buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn int_mod(len: usize, buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let pos = if len < buf.len() {
         random_range(len, buf.len())
     } else {
@@ -133,7 +133,7 @@ fn int_mod(len: usize, buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::IntMod)
 }
 
-fn ascii_mod(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn ascii_mod(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let pos = if len < buf.len() {
         random_range(len, buf.len())
     } else {
@@ -149,7 +149,7 @@ fn ascii_mod(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::AsciiMod)
 }
 
-fn hot_values(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn hot_values(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let pos = if len < buf.len() {
         random_range(len, buf.len())
     } else {
@@ -171,7 +171,7 @@ fn hot_values(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::HotValues)
 }
 
-fn block_insert(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn block_insert(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let pos = if len < buf.len() {
         random_range(len, buf.len())
     } else {
@@ -188,7 +188,7 @@ fn block_insert(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::BlockInsert)
 }
 
-fn block_rm(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn block_rm(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let pos = if len < buf.len() {
         random_range(len, buf.len())
     } else {
@@ -203,7 +203,7 @@ fn block_rm(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::BlockRm)
 }
 
-fn block_shuffle(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
+pub fn block_shuffle(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     for _ in 0..=random(2) {
         let ins = random(buf.len());
         let rmv = random(buf.len());
@@ -221,3 +221,20 @@ fn block_shuffle(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
 fn arithmetic(buf: Vec<u8>, len: usize) {}
 fn block_swap(buf: Vec<u8>) {}
 fn block_merge(buf: Vec<u8>) {}
+
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let v = "AAAAAAAAAAAA";
+        let a = mutate(v.as_bytes().to_vec(),8);
+        println!("\"{}\" - {:?}",v,String::from_utf8_lossy(&a));
+        //assert_ne!(String::from_utf8_lossy(&a), v);
+    }
+}
