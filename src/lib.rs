@@ -1,8 +1,6 @@
 use rand;
-use std::collections::VecDeque;
-use std::format;
-use std::io::Read;
 use rand::distributions::{Distribution, Uniform};
+use std::collections::VecDeque;
 
 pub fn random(n: usize) -> usize {
     let range = Uniform::from(0..n);
@@ -52,7 +50,7 @@ pub fn mutate(buf: Vec<u8>, rand: usize) -> Vec<u8> {
 
     let len = buf.len();
     let (buf, mutant) = loop {
-        let (mut buf, mutant) = match random(rand) {
+        let (buf, mutant) = match random(rand) {
             1 => ascii_mod(len, buf.clone()),
             0 => bit_flip(len, buf.clone()),
             2 => nibble_flip(len, buf.clone()),
@@ -171,6 +169,7 @@ pub fn hot_values(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     (buf, MutType::HotValues)
 }
 
+//Needs a bit more tweaking to control block size
 pub fn block_insert(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     let pos = if len < buf.len() {
         random_range(len, buf.len())
@@ -181,7 +180,7 @@ pub fn block_insert(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
         buf.push(random_range(20, 128) as u8);
     }
     if random(3) % 2 == 0 {
-        let mut p = &mut buf[..];
+        let p = &mut buf[..];
         p.reverse();
         buf = p.to_vec();
     }
@@ -196,7 +195,7 @@ pub fn block_rm(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
     };
     buf.remove(pos);
     if random(3) % 2 == 0 {
-        let mut p = &mut buf[..];
+        let p = &mut buf[..];
         p.reverse();
         buf = p.to_vec();
     }
@@ -210,7 +209,7 @@ pub fn block_shuffle(len: usize, mut buf: Vec<u8>) -> (Vec<u8>, MutType) {
         let temp = buf.remove(rmv);
         buf.insert(ins, temp);
         if random(3) % 2 == 0 {
-            let mut p = &mut buf[..];
+            let p = &mut buf[..];
             p.reverse();
             buf = p.to_vec();
         }
@@ -222,19 +221,23 @@ fn arithmetic(buf: Vec<u8>, len: usize) {}
 fn block_swap(buf: Vec<u8>) {}
 fn block_merge(buf: Vec<u8>) {}
 
-
-
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn it_works() {
-        let v = "AAAAAAAAAAAA";
-        let a = mutate(v.as_bytes().to_vec(),8);
-        println!("\"{}\" - {:?}",v,String::from_utf8_lossy(&a));
+        let mut v = "HI IM SUHAIL RAFEEQ FROM CALICUT ".as_bytes().to_vec();
+        loop {
+            // v = mutate(v.clone(), 8);
+            // let (v1,m1) = byte_mod(v.clone().len(),v.clone());
+            let (v1, m1) = block_shuffle(v.clone().len(), v.clone());
+            v = v1;
+            unsafe {
+                println!("{}", String::from_utf8(v.clone()).unwrap());
+            }
+        }
+        //println!("{:?} - {:?}", String::from_utf8_lossy(&v), String::from_utf8_lossy(&a));
         //assert_ne!(String::from_utf8_lossy(&a), v);
     }
 }
